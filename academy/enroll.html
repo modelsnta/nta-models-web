@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTA Academy | Enroll Now</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // IMPORTANT: Set debug level for visibility of Firestore activity
+        setLogLevel('debug');
+        
+        let db;
+        let auth;
+        let userId = null;
+        let appId;
+        
+        // Ensure global variables are defined (MANDATORY FOR CANVAS)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        appId = typeof __app_id !== 'undefined' ? __app_id : 'default-academy-app';
+
+        // Initialize Firebase
+        if (firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            console.log("Firebase App Initialized.");
+
+            // Authentication Function
+            async function authenticate() {
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Signed in with custom token.");
+                    } else {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously.");
+                    }
+                } catch (error) {
+                    console.error("Firebase Auth Error:", error);
+                }
+            }
+
+            // Listen for auth state changes and set userId
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    console.log("User ID set:", userId);
+                } else {
+                    // Fallback for userId if auth fails or not ready
+                    userId = crypto.randomUUID(); 
+                    console.log("User ID set to random UUID:", userId);
+                }
+                document.getElementById('enrollment-form').addEventListener('submit', handleFormSubmission);
+            });
+            
+            // Start authentication process
+            authenticate();
+        } else {
+            console.error("Firebase config is missing. Application will run without data persistence.");
+            document.getElementById('enrollment-form').addEventListener('submit', handleFormSubmission);
+        }
+
+        // --- Core Application Logic ---
+
+        const DEPOSIT_IN_PERSON = 125;
+        const DEPOSIT_ODL = 75;
+
+        // Function to calculate and update the deposit display
+        function updateDepositDisplay() {
+            const trainingModeSelect = document.getElementById('preferredTrainingMode');
+            const depositInfo = document.getElementById('depositInfo');
+            const selectedMode = trainingModeSelect.value;
+            let depositAmount = 0;
+            let fee = 0;
+            let feeDetails = '';
+            
+            if (selectedMode === 'In-Person Training') {
+                depositAmount = DEPOSIT_IN_PERSON;
+                fee = 250;
+                feeDetails = 'R250 Registration Fee, R125 Deposit Required.';
+            } else if (selectedMode === 'ODL / Online Training') {
+                depositAmount = DEPOSIT_ODL;
+                fee = 150;
+                feeDetails = 'R150 Registration Fee, R75 Deposit Required.';
+            }
+            
+            if (depositAmount > 0) {
+                // Modified styling: Removed bg-red-100, border-red-300, and used light font weight
+                depositInfo.innerHTML = `
+                    <p class="text-sm font-montserrat-light text-black">
+                        Registration Fee: <span class="text-red-600">R${fee}</span>
+                    </p>
+                    <p class="text-lg font-montserrat-light mt-1 text-black">
+                        50% Deposit Due Now: <span class="font-bodoni text-red-600">R${depositAmount}</span>
+                    </p>
+                `;
+                depositInfo.setAttribute('data-deposit', depositAmount);
+            } else {
+                depositInfo.innerHTML = '<p class="text-sm text-gray-500 font-montserrat-light">Please select a Training Mode to see the required deposit.</p>';
+                depositInfo.setAttribute('data-deposit', 0);
+            }
+        }
+
+        window.onload = function() {
+            // Attach change listener to update deposit
+            document.getElementById('preferredTrainingMode')?.addEventListener('change', updateDepositDisplay);
+            // Initial call to set the default state
+            updateDepositDisplay();
+        };
+
+        // Function to show custom message box instead of alert
+        function showMessage(title, message, isError = false) {
+            const modal = document.getElementById('customModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalIcon = document.getElementById('modalIcon');
+            
+            modalTitle.textContent = title;
+            modalMessage.innerHTML = message;
+
+            if (isError) {
+                modalTitle.classList.add('text-red-600');
+                modalTitle.classList.remove('text-green-600');
+                modalIcon.innerHTML = '<i class="fas fa-exclamation-triangle text-red-600 text-4xl"></i>';
+            } else {
+                modalTitle.classList.add('text-green-600');
+                modalTitle.classList.remove('text-red-600');
+                modalIcon.innerHTML = '<i class="fas fa-check-circle text-green-600 text-4xl"></i>';
+            }
+
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        // Close message box
+        window.closeModal = function() {
+            document.getElementById('customModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        };
+
+        // --- Submission Handler ---
+        async function handleFormSubmission(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const depositAmount = parseFloat(document.getElementById('depositInfo').getAttribute('data-deposit'));
+            
+            // Basic validation
+            if (!data.fullNames || !data.email || !data.phone || !data.address || !data.courseApplyingFor || !data.applicationFor || !data.preferredTrainingMode || !data.paymentPlan) {
+                showMessage("Validation Error", "Please fill in all mandatory fields before proceeding.", true);
+                return;
+            }
+
+            if (!data.agreeTerms) {
+                showMessage("Terms & Conditions", "You must agree to the Terms and Conditions to submit your application.", true);
+                return;
+            }
+
+            // Confirmation and PayFast simulation
+            // Note: Bolding kept in confirmation modal for emphasis, but not in main content
+            const confirmationMessage = `
+                <p>You are about to submit your application. To proceed, you must pay the 50% registration deposit:</p>
+                <div class="mt-4 p-3 border border-gray-300 rounded-md bg-gray-50">
+                    <p class="text-black font-bold text-xl">Deposit Due: R${depositAmount}</p>
+                    <p class="text-sm text-gray-700 mt-1">
+                        (R${depositAmount} for ${data.preferredTrainingMode}). 
+                        <span class="font-bold">By clicking 'Confirm & Pay' below, you simulate successful payment via PayFast.</span>
+                    </p>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">
+                    In a live environment, you would now be redirected to the PayFast gateway.
+                </p>
+                <div class="flex justify-center space-x-4 mt-6">
+                    <button type="button" onclick="closeModal()" class="py-2 px-6 bg-gray-200 text-black rounded-md hover:bg-gray-300 transition">Cancel</button>
+                    <button type="button" id="confirmPaymentButton" class="py-2 px-6 bg-green-600 text-white rounded-md hover:bg-green-700 transition">Confirm & Pay</button>
+                </div>
+            `;
+            
+            showMessage("Payment Gateway Simulation", confirmationMessage, false);
+
+            document.getElementById('confirmPaymentButton').onclick = async () => {
+                closeModal();
+                await submitApplication(data, depositAmount);
+            };
+        }
+
+        // --- Data Persistence ---
+        async function submitApplication(data, depositAmount) {
+            const submitButton = document.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
+            
+            const enrollmentRecord = {
+                ...data,
+                userId: userId,
+                depositPaid: `R${depositAmount}`,
+                depositStatus: 'Paid (Simulated)',
+                applicationDate: new Date().toISOString(),
+                trainingMode: data.preferredTrainingMode // Explicitly capture the text description
+            };
+
+            // Remove the 'agreeTerms' field from the stored record
+            delete enrollmentRecord.agreeTerms;
+
+            if (db && userId) {
+                try {
+                    const colRef = collection(db, `artifacts/${appId}/public/data/academy_enrollments`);
+                    await addDoc(colRef, enrollmentRecord);
+                    
+                    // Note: Bolding kept in success message for emphasis
+                    showMessage(
+                        "Application Submitted!", 
+                        `Thank you, ${data.fullNames}! Your enrollment application has been successfully submitted and saved to our database. We will contact you via email at <strong>${data.email}</strong> regarding your acceptance and Talent 360 credentials shortly.`, 
+                        false
+                    );
+                    document.getElementById('enrollment-form').reset();
+                } catch (error) {
+                    console.error("Error submitting application to Firestore:", error);
+                    showMessage("Submission Error", "There was an issue saving your application. Please check the console for details or try again.", true);
+                }
+            } else {
+                // If Firebase is not initialized (e.g., config missing)
+                console.warn("Application data not saved to Firestore. Data payload:", enrollmentRecord);
+                showMessage(
+                    "Application Received (No Save)", 
+                    `Your form data has been collected, but due to a configuration error, it could not be saved to the database. Please contact us directly at info@ntamodels.co.za with your details.`, 
+                    true
+                );
+            }
+            
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'SUBMIT APPLICATION';
+        }
+    </script>
+
+    <style>
+        /*
+        * ----------------------------------------------------
+        * 1. Font Definitions and Utility Classes
+        * ----------------------------------------------------
+        */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;700&display=swap');
+
+        /* Custom Fonts */
+        .font-bodoni { font-family: 'Playfair Display', serif; font-weight: 400; }
+        .font-montserrat-light { font-family: 'Montserrat', sans-serif; font-weight: 300; }
+        .font-montserrat-bold { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+        
+        /* General site styling: Pure White Background, Pure Black Text */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FFFFFF;
+            padding-top: 80px; 
+            font-weight: 300; /* Defaulting body text to light */
+        }
+
+        /* Color Overrides */
+        .text-black { color: #000000 !important; }
+        .text-white-override * { color: #FFFFFF !important; }
+        .text-white { color: #FFFFFF !important; }
+
+        /*
+        * ----------------------------------------------------
+        * 2. Header and Menu Styles (Copied for consistency)
+        * ----------------------------------------------------
+        */
+        #main-header { z-index: 9999; box-shadow: none; border-bottom: none; }
+        .hamburger-line { display: block; width: 30px; height: 2px; background-color: #000000; margin: 6px 0; transition: all 0.3s ease-in-out; border-radius: 9999px; }
+        .hamburger.open .hamburger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.open .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger.open .hamburger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        .side-menu { position: fixed; top: 0; left: -100vw; width: 100vw; height: 100vh; background-color: #FFFFFF; z-index: 9998; transition: left 0.3s ease-in-out; overflow-y: auto; padding: 2rem; padding-top: 100px; }
+        .side-menu.open { left: 0; }
+        .side-menu-content { display: flex; flex-direction: column; align-items: center; } 
+        .menu-item { position: relative; display: block; text-align: center; text-decoration: none; transition: color 0.15s ease; width: fit-content; margin: 0 auto; }
+        .menu-item::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); bottom: -2px; width: 0; height: 2px; background-color: #000000; transition: width 0.3s ease-in-out; }
+        .menu-item:hover::after { width: 100%; }
+        .menu-group-1 a { font-size: 1.5rem; padding: 8px 0; line-height: 1.2; font-weight: 400; }
+        .menu-group-2 a { font-size: 1.15rem; padding: 6px 0; font-weight: 300; }
+        .character-text { letter-spacing: 0.15em; display: inline-block; }
+        .character-text span:nth-child(1) { color: #FF0000 !important; } 
+        .character-text span:nth-child(2) { color: #00A651 !important; } 
+        .character-text span:nth-child(3) { color: #0000FF !important; } 
+        .character-text span:nth-child(4) { color: #FFD700 !important; } 
+        .character-text span:nth-child(5) { color: #8A2BE2 !important; } 
+        .character-text span:nth-child(6) { color: #FF4500 !important; } 
+        .character-text span:nth-child(7) { color: #1E90FF !important; } 
+        .character-text span:nth-child(8) { color: #DC143C !important; } 
+        .character-text span:nth-child(9) { color: #3CB371 !important; } 
+
+        /* Form Custom Styles */
+        .form-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; /* Slightly smaller */
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #000000; /* Subtle line remains for separation */
+            padding-bottom: 0.25rem;
+            font-weight: 400;
+        }
+        .input-style {
+            border: 1px solid #000000;
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            transition: border-color 0.3s;
+        }
+        .input-style:focus {
+            border-color: #6B7280;
+            outline: none;
+        }
+        
+        /* Modal Backdrop */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- FIXED HEADER (Z-index: 9999) - KEPT FOR NAVIGATION -->
+<header id="main-header" class="fixed top-0 left-0 w-full bg-white h-20">
+
+    <!-- Mobile View -->
+    <div class="flex justify-between items-center h-full px-4 sm:hidden">
+        <button id="hamburger-mobile" class="hamburger p-2">
+            <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+        </button>
+        <div class="flex-grow flex justify-center">
+            <!-- Academy Header Logo -->
+            <img src="../assets/acalogo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/200x45/000000/FFFFFF?text=ACADEMY+LOGO'" 
+                 alt="NTA Academy Logo" class="logo h-12 w-auto max-w-[200px]">
+        </div>
+        <div class="w-10"></div>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="hidden sm:flex justify-between items-center h-full px-10">
+        <nav class="flex items-center space-x-4">
+            <a href="../agency/index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">AGENCY</a>
+            <span class="text-black text-sm font-montserrat-light">|</span>
+            <a href="index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">ACADEMY</a>
+        </nav>
+        <div class="flex-shrink-0">
+            <!-- Academy Header Logo -->
+            <img src="../assets/acalogo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/180x40/000000/FFFFFF?text=ACADEMY+LOGO'" 
+                 alt="NTA Academy Logo" class="logo h-12 w-auto">
+        </div>
+        <nav class="flex items-center space-x-4">
+            <a href="../contact.html" class="font-montserrat-light text-sm uppercase menu-item text-black">CONTACT</a>
+            <a href="../apply.html" class="font-montserrat-light text-sm uppercase menu-item text-black">GET SCOUTED</a>
+            <button id="hamburger-desktop" class="hamburger p-2 ml-4">
+                <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+            </button>
+        </nav>
+    </div>
+</header>
+
+<!-- SIDE MENU - KEPT FOR NAVIGATION -->
+<div id="side-menu" class="side-menu">
+    <div class="side-menu-content">
+        <div class="space-y-1 mb-6 menu-group-1">
+            <a href="../agency/index.html" class="menu-item font-bodoni uppercase text-black">AGENCY</a>
+            <a href="index.html" class="menu-item font-bodoni uppercase text-black">ACADEMY</a>
+            <a href="../character/index.html" class="menu-item font-bodoni uppercase text-black">
+                <span class="character-text">
+                    <span>C</span><span>H</span><span>A</span><span>R</span><span>A</span><span>C</span><span>T</span><span>E</span><span>R</span>
+                </span>
+            </a>
+            <a href="../apply.html" class="menu-item font-bodoni uppercase text-black">GET SCOUTED</a>
+            <a href="../contact.html" class="menu-item font-bodoni uppercase text-black">CONTACT</a>
+        </div>
+        <div class="space-y-1 menu-group-2">
+            <a href="../index.html" class="menu-item font-montserrat-light uppercase text-black">HOME</a>
+            <a href="../about.html" class="menu-item font-montserrat-light uppercase text-black">ABOUT</a>
+            <a href="courses.html" class="menu-item font-montserrat-light uppercase text-black">COURSES</a>
+            <!-- ENROLL NOW (Light weight now) -->
+            <a href="enroll.html" class="menu-item font-montserrat-light uppercase text-black">ENROLL NOW</a>
+            <!-- TALENT 360 LOGIN PORTAL -->
+            <a href="talent360.html" class="menu-item font-montserrat-light uppercase text-black">TALENT 360 LOGIN PORTAL</a>
+        </div>
+        <div class="social-icons-row mt-6">
+            <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook" class="mx-3"><i class="fab fa-facebook-f text-2xl text-black"></i></a>
+            <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram" class="mx-3"><i class="fab fa-instagram text-2xl text-black"></i></a>
+            <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok" class="mx-3"><i class="fab fa-tiktok text-2xl text-black"></i></a>
+            <a href="mailto:info@ntamodels.co.za" aria-label="Email" class="mx-3"><i class="fas fa-envelope text-2xl text-black"></i></a>
+            <a href="tel:+27780093318" aria-label="Phone" class="mx-3"><i class="fas fa-phone text-2xl text-black"></i></a>
+        </div>
+    </div>
+</div>
+
+<main class="bg-white py-12 px-4 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="font-bodoni text-black text-4xl sm:text-5xl uppercase tracking-wider mb-2 text-center">
+            Academy Enrollment
+        </h1>
+        <p class="font-montserrat-light text-lg text-black text-center mb-10">
+            Enroll in our Academy to develop your skills as a Model or Talent. Please read the guidelines carefully before submitting.
+        </p>
+
+        <!-- APPLICATION GUIDELINES & FEES - NOW NUMBERED LIST -->
+        <section class="mb-12 px-0">
+            <h2 class="form-section-title text-black">Application Guidelines & Fees</h2>
+            
+            <!-- Restructured to a single numbered list for clarity -->
+            <ol class="list-decimal list-inside ml-4 space-y-3 mb-6 text-sm font-montserrat-light text-black">
+                <li>
+                    <h3 class="font-montserrat-light text-base text-black inline">In-Person Training (Bloemfontein, FS & Cape Town Areas)</h3>
+                    <p class="text-gray-700 mt-1">Registration Fee: R250</p>
+                    <p class="text-red-600">50% Deposit Required: R125 (with this form)</p>
+                </li>
+                <li>
+                    <h3 class="font-montserrat-light text-base text-black inline">ODL (Open Distance Learning - Online)</h3>
+                    <p class="text-gray-700 mt-1">Registration Fee: R150</p>
+                    <p class="text-red-600">50% Deposit Required: R75 (with this form)</p>
+                </li>
+            </ol>
+
+            <p class="font-montserrat-light text-sm text-black pt-4">
+                The remaining 50% of the registration fee must be paid in full after successful acceptance and registration into the Academy.
+                After successful registration, you will receive credentials for your Talent 360 learning portal.
+                <br><br>
+                For details on the various <a href="courses.html" class="text-blue-600 hover:underline font-montserrat-light">Courses</a> we offer, please visit the Academy page. For general inquiries, consult our <a href="../faqs.html" class="text-blue-600 hover:underline font-montserrat-light">FAQs page</a> or email us at <a href="mailto:info@ntamodels.co.za" class="text-blue-600 hover:underline font-montserrat-light">info@ntamodels.co.za</a>.
+            </p>
+        </section>
+
+        <!-- ENROLLMENT FORM -->
+        <form id="enrollment-form">
+            <!-- 1. PERSONAL INFORMATION -->
+            <h2 class="form-section-title text-black">1. Personal Information</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Full Names -->
+                <label class="block">
+                    <span class="font-montserrat-light text-sm text-black">Full Names (As per ID) *</span>
+                    <input type="text" name="fullNames" required class="mt-1 block w-full input-style">
+                </label>
+                <!-- Email Address -->
+                <label class="block">
+                    <span class="font-montserrat-light text-sm text-black">Email Address *</span>
+                    <input type="email" name="email" required class="mt-1 block w-full input-style">
+                </label>
+                <!-- Phone Number -->
+                <label class="block">
+                    <span class="font-montserrat-light text-sm text-black">Phone Number *</span>
+                    <input type="tel" name="phone" required class="mt-1 block w-full input-style">
+                </label>
+                <!-- Date of Birth -->
+                <label class="block">
+                    <span class="font-montserrat-light text-sm text-black">Date of Birth *</span>
+                    <input type="date" name="dateOfBirth" required class="mt-1 block w-full input-style">
+                </label>
+            </div>
+            
+            <!-- Current Residential Address -->
+            <label class="block mb-8">
+                <span class="font-montserrat-light text-sm text-black">Current Residential Address (City/Suburb, Province) *</span>
+                <input type="text" name="address" required class="mt-1 block w-full input-style">
+            </label>
+
+            <!-- 2. ENROLLMENT DETAILS -->
+            <h2 class="form-section-title text-black">2. Enrollment Details</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Course Applying For -->
+                <label class="block">
+                    <span class="font-montserrat-light text-sm text-black">Course Applying For *</span>
+                    <select name="courseApplyingFor" required class="mt-1 block w-full input-style">
+                        <option value="">--- Select Academy Program ---</option>
+                        <option value="Full Development 101 (In-Person)">Full Development 101 (In-Person)</option>
+                        <option value="One-on-One Mentor (Online)">One-on-One Mentor (Online)</option>
+                        <option value="3-Month Intensive Course">3-Month Intensive Course</option>
+                        <option value="Portfolio & Z-Card Services Only">Portfolio & Z-Card Services Only</option>
+                    </select>
+                </label>
+                
+                <!-- Training Mode (Controls the deposit fee) -->
+                <label class="block">
+                    <span class="font-montserrat-light text-sm text-black">Preferred Training Mode *</span>
+                    <select id="preferredTrainingMode" name="preferredTrainingMode" required class="mt-1 block w-full input-style">
+                        <option value="">--- Select Training Mode ---</option>
+                        <option value="In-Person Training">In-Person Training (R125 Deposit)</option>
+                        <option value="ODL / Online Training">ODL / Online Training (R75 Deposit)</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Role Applying For -->
+                <div class="block">
+                    <span class="font-montserrat-light text-sm text-black block mb-2">Are you applying for: *</span>
+                    <div class="flex flex-col space-y-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="applicationFor" value="Modeling" required class="form-radio text-black border-black">
+                            <span class="ml-2 text-sm text-black font-montserrat-light">Modeling (Fashion, Commercial, etc.)</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="applicationFor" value="Talent" required class="form-radio text-black border-black">
+                            <span class="ml-2 text-sm text-black font-montserrat-light">Talent (Musicians, Influencers, Actors, etc.)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Plan -->
+                <div class="block">
+                    <span class="font-montserrat-light text-sm text-black block mb-2">Preferred Payment Plan for Course Fees (Excluding Registration): *</span>
+                    <div class="flex flex-col space-y-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="paymentPlan" value="Once-off Full Payment" required class="form-radio text-black border-black">
+                            <span class="ml-2 text-sm text-black font-montserrat-light">Once-off Full Payment</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="paymentPlan" value="Monthly Installments" required class="form-radio text-black border-black">
+                            <span class="ml-2 text-sm text-black font-montserrat-light">Monthly Installments</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEPOSIT CALCULATOR DISPLAY (Unboxed, light styling via JS) -->
+            <div id="depositInfo" class="text-center p-0 mb-8" data-deposit="0">
+                <p class="text-sm text-gray-500 font-montserrat-light">Please select a Training Mode to see the required deposit.</p>
+            </div>
+
+
+            <!-- 3. TERMS AND CONDITIONS - NOW NUMBERED LIST -->
+            <h2 class="form-section-title text-black">3. Terms and Conditions</h2>
+            
+            <!-- Terms text (Unboxed) -->
+            <div class="text-sm text-gray-700 space-y-3 mb-6 p-0">
+                <p class="font-montserrat-light text-black">By submitting this form, you agree to the following mandatory terms:</p>
+                <!-- Changed to ordered list (<ol>) -->
+                <ol class="list-decimal list-inside space-y-1 ml-4 font-montserrat-light text-black">
+                    <li>The 50% deposit of the registration fee (R125 for In-Person / R75 for ODL) is non-refundable upon submission.</li>
+                    <li>The application will not be processed until proof of the 50% registration deposit is received by NTA Models & Talent Academy. (This payment is simulated by clicking "Confirm & Pay" on the next screen).</li>
+                    <li>The remaining 50% of the registration fee is due immediately upon notification of successful enrollment.</li>
+                    <li>Failure to pay the remaining registration fee within 7 days of acceptance may lead to the cancellation of your application.</li>
+                    <li>Course monthly payment plans must adhere strictly to the agreed-upon payment dates; late payments may incur penalties.</li>
+                    <li>Course once-off payments must be completed prior to the commencement of the first class or session.</li>
+                    <li>Cancellation of enrollment after the course has begun requires written notice, and a cancellation fee may apply.</li>
+                    <li>Refunds for monthly payments are not provided for missed classes or voluntary withdrawal after the first week of the course.</li>
+                    <li>NTA Academy reserves the right to terminate enrollment for non-compliance with the Code of Conduct or repeated payment failure.</li>
+                    <li>All personal information collected is for internal use only and will be handled in accordance with the POPI Act.</li>
+                </ol>
+            </div>
+
+            <label class="flex items-center mb-10">
+                <input type="checkbox" name="agreeTerms" required class="form-checkbox text-black border-black rounded" value="agreed">
+                <span class="ml-3 font-montserrat-light text-black">I have read, understood, and agree to the Terms and Conditions above. *</span>
+            </label>
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" class="w-full py-4 bg-black text-white font-montserrat-light uppercase text-lg rounded-md hover:bg-gray-800 transition duration-300">
+                SUBMIT APPLICATION
+            </button>
+            <p class="text-center text-sm mt-3 text-red-600 font-montserrat-light">You will be prompted to make your deposit before your application is submitted.</p>
+        </form>
+    </div>
+</main>
+
+<!-- CUSTOM MESSAGE BOX/MODAL (PayFast Simulation) - KEPT BORDERED FOR FOCUS -->
+<div id="customModal" class="modal-backdrop hidden" onclick="closeModal()">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-lg w-full mx-4" onclick="event.stopPropagation()">
+        <div class="text-center mb-6">
+            <div id="modalIcon" class="mb-4"></div>
+            <h3 id="modalTitle" class="font-bodoni text-2xl font-montserrat-light mb-2"></h3>
+            <p id="modalMessage" class="font-montserrat-light text-black"></p>
+        </div>
+        <div class="text-center">
+            <button onclick="closeModal()" class="py-2 px-6 bg-black text-white rounded-md hover:bg-gray-700 transition hidden" id="closeButtonDefault">Close</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- FOOTER (Black Background, White Text) - KEPT FOR NAVIGATION -->
+<footer class="bg-black p-8 md:p-12 font-montserrat-light text-white-override mt-12">
+    <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+        
+        <!-- Large centered image logo (Academy Footer Logo) -->
+        <img src="../assets/acalogo2.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x60/FFFFFF/000000?text=ACADEMY+LOGO+2'" 
+             alt="NTA Academy Footer Logo" class="h-16 w-auto mb-6">
+
+        <!-- Footer Navigation -->
+        <div class="mb-10 flex flex-wrap justify-center space-x-4 sm:space-x-8">
+            <a href="../agency/index.html" class="font-montserrat-light uppercase text-white hover:text-gray-400 transition whitespace-nowrap">AGENCY</a>
+            <a href="index.html" class="font-montserrat-light uppercase text-white hover:text-gray-400 transition whitespace-nowrap">ACADEMY</a>
+            <a href="../apply.html" class="font-montserrat-light uppercase text-white hover:text-gray-400 transition whitespace-nowrap">GET SCOUTED</a>
+        </div>
+
+        <!-- Content columns -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 text-center md:text-left">
+            
+            <!-- 1. Office Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-light uppercase mb-2 text-lg text-white">Office:</h3>
+                <p class="mb-1">Cape Town, South Africa</p>
+                <p class="mb-4">Bloemfontein, Free State</p>
+                <p class="flex items-center mb-1">
+                    <i class="fas fa-phone mr-3 text-white"></i>
+                    +27 78 009 3318
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-envelope mr-3 text-white"></i>
+                    info@ntamodels.co.za
+                </p>
+            </div>
+
+            <!-- 2. Operating Hours Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-light uppercase mb-2 text-lg text-white">Operating Hours:</h3>
+                <p>Monday - Friday (08:30 - 17:00)</p>
+                <p>Saturday (08:30 - 13:00)</p>
+                <p>Sunday (Closed)</p>
+                <p>Public Holidays (Appointment Only)</p>
+            </div>
+
+            <!-- 3. Follow Us Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-light uppercase mb-4 text-lg text-white">Follow us</h3>
+                <div class="flex space-x-6 justify-start">
+                    <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook">
+                        <i class="fab fa-facebook-f text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram">
+                        <i class="fab fa-instagram text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok">
+                        <i class="fab fa-tiktok text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <p class="text-sm mt-8 pt-4 w-full text-center">
+            Copyright © NTA MODELS | All Rights Reserved | Web Designs by 
+            <a href="https://webbytlotly.netlify.app/" target="_blank" class="hover:text-gray-400 transition text-white no-underline">Tlotly</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    // ------------------------------------------------------------------
+    // Menu Toggle Logic
+    // ------------------------------------------------------------------
+    const hamburgerMobile = document.getElementById('hamburger-mobile');
+    const hamburgerDesktop = document.getElementById('hamburger-desktop');
+    const sideMenu = document.getElementById('side-menu');
+
+    function toggleMenu() {
+        const isOpen = sideMenu.classList.toggle('open');
+        
+        if (hamburgerMobile) {
+             hamburgerMobile.classList.toggle('open', isOpen);
+        }
+        if (hamburgerDesktop) {
+            hamburgerDesktop.classList.toggle('open', isOpen);
+        }
+
+        document.body.classList.toggle('overflow-hidden', isOpen); 
+    }
+
+    if (hamburgerMobile) {
+        hamburgerMobile.addEventListener('click', toggleMenu);
+    }
+    if (hamburgerDesktop) {
+        hamburgerDesktop.addEventListener('click', toggleMenu);
+    }
+
+    document.querySelectorAll('.side-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (sideMenu.classList.contains('open')) {
+                toggleMenu();
+            }
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (sideMenu.classList.contains('open') && window.innerWidth >= 640) {
+            sideMenu.classList.remove('open');
+            if (hamburgerDesktop) hamburgerDesktop.classList.remove('open');
+            if (hamburgerMobile) hamburgerMobile.classList.remove('open');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+</script>
+</body>
+</html>

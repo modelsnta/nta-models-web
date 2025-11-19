@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTA Academy | Course Offerings</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for Social Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /*
+        * ----------------------------------------------------
+        * 1. Font Definitions and Utility Classes
+        * ----------------------------------------------------
+        */
+        /* Using Playfair Display (Serif/Bodoni) and Montserrat (Sans-serif) */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;700&display=swap');
+
+        /* Custom Fonts */
+        .font-bodoni { font-family: 'Playfair Display', serif; font-weight: 400; }
+        .font-montserrat-light { font-family: 'Montserrat', sans-serif; font-weight: 300; }
+        .font-montserrat-bold { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+        
+        /* General site styling: Pure White Background, Pure Black Text */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FFFFFF;
+            padding-top: 80px; 
+        }
+
+        /* Color Overrides */
+        .text-black { color: #000000 !important; }
+        .text-white-override * { color: #FFFFFF !important; }
+        .text-white { color: #FFFFFF !important; }
+
+        /*
+        * ----------------------------------------------------
+        * 2. Header and Menu Styles (Copied from index.html for consistency)
+        * ----------------------------------------------------
+        */
+        #main-header { z-index: 9999; box-shadow: none; border-bottom: none; }
+        .hamburger-line { display: block; width: 30px; height: 2px; background-color: #000000; margin: 6px 0; transition: all 0.3s ease-in-out; border-radius: 9999px; }
+        .hamburger.open .hamburger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.open .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger.open .hamburger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        .side-menu { position: fixed; top: 0; left: -100vw; width: 100vw; height: 100vh; background-color: #FFFFFF; z-index: 9998; transition: left 0.3s ease-in-out; overflow-y: auto; padding: 2rem; padding-top: 100px; }
+        .side-menu.open { left: 0; }
+        .side-menu-content { display: flex; flex-direction: column; align-items: center; } 
+        .menu-item { position: relative; display: block; text-align: center; text-decoration: none; transition: color 0.15s ease; width: fit-content; margin: 0 auto; }
+        .menu-item::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); bottom: -2px; width: 0; height: 2px; background-color: #000000; transition: width 0.3s ease-in-out; }
+        .menu-item:hover::after { width: 100%; }
+        .menu-group-1 a { font-size: 1.5rem; padding: 8px 0; line-height: 1.2; font-weight: 400; }
+        .menu-group-2 a { font-size: 1.15rem; padding: 6px 0; font-weight: 300; }
+        .character-text { letter-spacing: 0.15em; display: inline-block; }
+        .character-text span:nth-child(1) { color: #FF0000 !important; } 
+        .character-text span:nth-child(2) { color: #00A651 !important; } 
+        .character-text span:nth-child(3) { color: #0000FF !important; } 
+        .character-text span:nth-child(4) { color: #FFD700 !important; } 
+        .character-text span:nth-child(5) { color: #8A2BE2 !important; } 
+        .character-text span:nth-child(6) { color: #FF4500 !important; } 
+        .character-text span:nth-child(7) { color: #1E90FF !important; } 
+        .character-text span:nth-child(8) { color: #DC143C !important; } 
+        .character-text span:nth-child(9) { color: #3CB371 !important; } 
+
+        /*
+        * ----------------------------------------------------
+        * 3. Course Card Custom Styles
+        * ----------------------------------------------------
+        */
+        .course-card {
+            border: 1px solid #000000;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .course-card:hover {
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.15); /* Subtle shadow lift */
+            transform: translateY(-4px);
+        }
+        .course-header {
+            border-bottom: 1px solid #000000;
+        }
+        .cost-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #4A4A4A;
+        }
+        .cost-value {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            line-height: 1;
+            margin-top: 0.25rem;
+        }
+        .payment-plan {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 1rem;
+            color: #6B7280; /* Medium gray */
+        }
+        .pill {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 9999px;
+            margin-bottom: 0.5rem;
+        }
+        .pill-inperson {
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+        .pill-online {
+            background-color: #FACC15; /* Yellow accent */
+            color: #000000;
+        }
+        .pill-intensive {
+            background-color: #EF4444; /* Red accent */
+            color: #FFFFFF;
+        }
+
+        /* CTA Background Image Style */
+        .cta-background-section {
+            background-image: url('../assets/cta_background.jpg'); /* Placeholder for compelling image */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Parallax/fixed effect */
+            min-height: 300px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- FIXED HEADER (Z-index: 9999) -->
+<header id="main-header" class="fixed top-0 left-0 w-full bg-white h-20">
+
+    <!-- Mobile View -->
+    <div class="flex justify-between items-center h-full px-4 sm:hidden">
+        <button id="hamburger-mobile" class="hamburger p-2">
+            <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+        </button>
+        <div class="flex-grow flex justify-center">
+            <!-- Academy Header Logo -->
+            <img src="../assets/acalogo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/200x45/000000/FFFFFF?text=ACADEMY+LOGO'" 
+                 alt="NTA Academy Logo" class="logo h-12 w-auto max-w-[200px]">
+        </div>
+        <div class="w-10"></div>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="hidden sm:flex justify-between items-center h-full px-10">
+        <nav class="flex items-center space-x-4">
+            <a href="../agency/index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">AGENCY</a>
+            <span class="text-black text-sm font-montserrat-light">|</span>
+            <a href="index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">ACADEMY</a>
+        </nav>
+        <div class="flex-shrink-0">
+            <!-- Academy Header Logo -->
+            <img src="../assets/acalogo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/180x40/000000/FFFFFF?text=ACADEMY+LOGO'" 
+                 alt="NTA Academy Logo" class="logo h-12 w-auto">
+        </div>
+        <nav class="flex items-center space-x-4">
+            <a href="../contact.html" class="font-montserrat-light text-sm uppercase menu-item text-black">CONTACT</a>
+            <a href="../apply.html" class="font-montserrat-light text-sm uppercase menu-item text-black">GET SCOUTED</a>
+            <button id="hamburger-desktop" class="hamburger p-2 ml-4">
+                <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+            </button>
+        </nav>
+    </div>
+</header>
+
+<!-- SIDE MENU -->
+<div id="side-menu" class="side-menu">
+    <div class="side-menu-content">
+        <div class="space-y-1 mb-6 menu-group-1">
+            <a href="../agency/index.html" class="menu-item font-bodoni uppercase text-black">AGENCY</a>
+            <a href="index.html" class="menu-item font-bodoni uppercase text-black">ACADEMY</a>
+            <a href="../character/index.html" class="menu-item font-bodoni uppercase text-black">
+                <span class="character-text">
+                    <span>C</span><span>H</span><span>A</span><span>R</span><span>A</span><span>C</span><span>T</span><span>E</span><span>R</span>
+                </span>
+            </a>
+            <a href="../apply.html" class="menu-item font-bodoni uppercase text-black">GET SCOUTED</a>
+            <a href="../contact.html" class="menu-item font-bodoni uppercase text-black">CONTACT</a>
+        </div>
+        <div class="space-y-1 menu-group-2">
+            <a href="../index.html" class="menu-item font-montserrat-light uppercase text-black">HOME</a>
+            <a href="../about.html" class="menu-item font-montserrat-light uppercase text-black">ABOUT</a>
+            <a href="courses.html" class="menu-item font-montserrat-light uppercase text-black">COURSES</a>
+            <!-- ENROLL NOW (Bold) -->
+            <a href="enroll.html" class="menu-item font-montserrat-bold uppercase text-black">ENROLL NOW</a>
+            <!-- TALENT 360 LOGIN PORTAL -->
+            <a href="talent360.html" class="menu-item font-montserrat-light uppercase text-black">TALENT 360 LOGIN PORTAL</a>
+        </div>
+        <div class="social-icons-row mt-6">
+            <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook" class="mx-3"><i class="fab fa-facebook-f text-2xl text-black"></i></a>
+            <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram" class="mx-3"><i class="fab fa-instagram text-2xl text-black"></i></a>
+            <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok" class="mx-3"><i class="fab fa-tiktok text-2xl text-black"></i></a>
+            <a href="mailto:info@ntamodels.co.za" aria-label="Email" class="mx-3"><i class="fas fa-envelope text-2xl text-black"></i></a>
+            <a href="tel:+27780093318" aria-label="Phone" class="mx-3"><i class="fas fa-phone text-2xl text-black"></i></a>
+        </div>
+    </div>
+</div>
+
+<main class="bg-white">
+    
+    <!-- HEADER AND INTRO -->
+    <section class="pt-12 pb-8 px-6 lg:px-8 max-w-7xl mx-auto text-center">
+        <h1 class="font-bodoni text-black text-4xl sm:text-6xl uppercase tracking-wider mb-4">
+            Academy Courses
+        </h1>
+        <p class="font-montserrat-light text-lg text-black max-w-3xl mx-auto">
+            Choose the development path that best fits your goals and location. We offer both intensive in-person training and flexible online mentorship programs across South Africa.
+        </p>
+    </section>
+
+    <!-- MANDATORY REGISTRATION FEE NOTE (New Addition) -->
+    <section class="px-4 lg:px-8 max-w-4xl mx-auto mb-12">
+        <div class="p-6 bg-red-50 border-l-4 border-red-600 rounded-md shadow-md text-left">
+            <h2 class="font-montserrat-bold text-lg text-red-700 mb-2 uppercase">Important Enrollment Notice</h2>
+            <p class="font-montserrat-light text-sm text-black">
+                A mandatory Registration Fee of R250 is required to secure your spot. Additionally, 50% of the course fee must be paid upon enrolling at the academy to commence your training. This applies to all courses listed below.
+            </p>
+        </div>
+    </section>
+
+
+    <!-- COURSE CARDS GRID -->
+    <section class="py-12 px-4 lg:px-8 max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- COURSE 1: Full Development 101 (In-Person) -->
+            <div class="course-card p-6 bg-white rounded-lg shadow-lg">
+                <div class="course-header pb-4 mb-4">
+                    <span class="pill pill-inperson">In-Person Training</span>
+                    <h2 class="font-montserrat-bold text-2xl text-black mb-2">Full Development 101</h2>
+                    <p class="font-montserrat-light text-sm text-gray-700">Curriculum separated for Models and Talent.</p>
+                </div>
+
+                <div class="mb-6">
+                    <p class="cost-label">Total Cost</p>
+                    <p class="cost-value">R1 320</p>
+                    <p class="payment-plan">Flexible Payment: R120 per month (11 months)</p>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-montserrat-bold uppercase text-sm mb-2 text-black">Location Restricted:</h3>
+                    <ul class="list-disc list-inside font-montserrat-light text-sm text-gray-700 space-y-1 ml-4">
+                        <li>Open to students in the Free State, Bloemfontein, and Cape Town who can attend in-person classes.</li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-montserrat-bold uppercase text-sm mb-2 text-black">What's Covered:</h3>
+                    <ul class="list-disc list-inside font-montserrat-light text-sm text-black space-y-1 ml-4">
+                        <li>Weekly Classes/Workshops</li>
+                        <li>Scheduled Photoshoots (Included)</li>
+                        <li>Professional Training (Models & Talent)</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-montserrat-bold uppercase text-sm mb-2 text-black">Key Value Focus:</h3>
+                    <ul class="list-disc list-inside font-montserrat-light text-sm text-black space-y-1 ml-4">
+                        <li>Industry Etiquette & Branding</li>
+                        <li>Portfolio Development</li>
+                        <li>Casting & Audition Readiness</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- COURSE 2: One-on-One Mentor (Online) -->
+            <div class="course-card p-6 bg-white rounded-lg shadow-lg">
+                <div class="course-header pb-4 mb-4">
+                    <span class="pill pill-online">Open Distance Learning</span>
+                    <h2 class="font-montserrat-bold text-2xl text-black mb-2">One-on-One Mentor</h2>
+                    <p class="font-montserrat-light text-sm text-gray-700">Personalized guidance via Zoom.</p>
+                </div>
+
+                <div class="mb-6">
+                    <p class="cost-label">Total Cost</p>
+                    <p class="cost-value">R500</p>
+                    <p class="payment-plan">Flexible Payment: R100 per month (5 months)</p>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-montserrat-bold uppercase text-sm mb-2 text-black">Accessibility:</h3>
+                    <ul class="list-disc list-inside font-montserrat-light text-sm text-gray-700 space-y-1 ml-4">
+                        <li>Available to everyone across South Africa (Online).</li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-montserrat-bold uppercase text-sm mb-2 text-black">What's Covered:</h3>
+                    <ul class="list-disc list-inside font-montserrat-light text-sm text-black space-y-1 ml-4">
+                        <li>Dedicated Online Lessons (Zoom)</li>
+                        <li>Personalized Career Consultation</li>
+                    </ul>
+                </div>
+
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                    <h3 class="font-montserrat-bold text-xs uppercase text-red-600 mb-1">Note on Photoshoots:</h3>
+                    <p class="font-montserrat-light text-xs text-black">Photoshoots are not included in the R500 cost. Students must arrange and pay for their own shoots. We provide connection support for potential discounts.</p>
+                </div>
+            </div>
+
+            <!-- COURSE 3: 3-Month Intensive Course (Limited) -->
+            <div class="course-card p-6 bg-white rounded-lg shadow-lg">
+                <div class="course-header pb-4 mb-4">
+                    <span class="pill pill-intensive">Limited Space</span>
+                    <h2 class="font-montserrat-bold text-2xl text-black mb-2">3-Month Intensive Course</h2>
+                    <p class="font-montserrat-light text-sm text-gray-700">Fast-tracking essential industry skills.</p>
+                </div>
+                
+                <div class="mb-6">
+                    <p class="cost-label">Total Cost</p>
+                    <p class="cost-value">R360</p>
+                    <p class="payment-plan">Flexible Payment: R120 per month (3 months)</p>
+                    <p class="font-montserrat-bold text-sm text-green-700 mt-2">NO REGISTRATION FEE REQUIRED!</p>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-montserrat-bold uppercase text-sm mb-2 text-black">What's Included:</h3>
+                    <ul class="list-disc list-inside font-montserrat-light text-sm text-black space-y-1 ml-4">
+                        <li>Training/Classes</li>
+                        <li>Professional Z-Card Shoot (Included)</li>
+                        <li>1 Portfolio Shoot (Included)</li>
+                    </ul>
+                </div>
+
+                <div class="p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p class="font-montserrat-light text-xs text-black">Important: This course is limited. Keep an eye on our socials for exact registration dates and availability.</p>
+                </div>
+
+                <a href="enroll.html" class="mt-6 block text-center py-2 px-4 text-white font-montserrat-bold uppercase text-sm bg-black hover:opacity-85 transition rounded-sm">
+                    Register Interest
+                </a>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION (Enroll) - UPDATED WITH BACKGROUND IMAGE -->
+    <section class="cta-background-section relative flex flex-col justify-center items-center py-16 px-4">
+        <!-- Dark Overlay -->
+        <div class="absolute inset-0 bg-black bg-opacity-70"></div>
+        <div class="relative z-10 text-white text-center">
+            <h2 class="font-bodoni text-4xl mb-4">Ready to Start Your Journey?</h2>
+            <p class="font-montserrat-light text-lg mb-8">Click below to begin the enrollment process for your chosen course.</p>
+            <a href="enroll.html" class="inline-block py-3 px-10 text-white font-montserrat-light uppercase text-base border-2 border-white hover:bg-white hover:text-black transition duration-300 rounded-none">
+                APPLY TO ENROLL
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<!-- FOOTER (Black Background, White Text) -->
+<footer class="bg-black p-8 md:p-12 font-montserrat-light text-white-override">
+    <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+        
+        <!-- Large centered image logo (Academy Footer Logo) -->
+        <img src="../assets/acalogo2.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x60/FFFFFF/000000?text=ACADEMY+LOGO+2'" 
+             alt="NTA Academy Footer Logo" class="h-16 w-auto mb-6">
+
+        <!-- Footer Navigation -->
+        <div class="mb-10 flex flex-wrap justify-center space-x-4 sm:space-x-8">
+            <a href="../agency/index.html" class="font-montserrat-bold uppercase text-white hover:text-gray-400 transition whitespace-nowrap">AGENCY</a>
+            <a href="index.html" class="font-montserrat-bold uppercase text-white hover:text-gray-400 transition whitespace-nowrap">ACADEMY</a>
+            <a href="../apply.html" class="font-montserrat-bold uppercase text-white hover:text-gray-400 transition whitespace-nowrap">GET SCOUTED</a>
+        </div>
+
+        <!-- Content columns -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 text-center md:text-left">
+            
+            <!-- 1. Office Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-bold uppercase mb-2 text-lg text-white">Office:</h3>
+                <p class="mb-1">Cape Town, South Africa</p>
+                <p class="mb-4">Bloemfontein, Free State</p>
+                <p class="flex items-center mb-1">
+                    <i class="fas fa-phone mr-3 text-white"></i>
+                    +27 78 009 3318
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-envelope mr-3 text-white"></i>
+                    info@ntamodels.co.za
+                </p>
+            </div>
+
+            <!-- 2. Operating Hours Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-bold uppercase mb-2 text-lg text-white">Operating Hours:</h3>
+                <p>Monday - Friday (08:30 - 17:00)</p>
+                <p>Saturday (08:30 - 13:00)</p>
+                <p>Sunday (Closed)</p>
+                <p>Public Holidays (Appointment Only)</p>
+            </div>
+
+            <!-- 3. Follow Us Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-bold uppercase mb-4 text-lg text-white">Follow us</h3>
+                <div class="flex space-x-6 justify-start">
+                    <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook">
+                        <i class="fab fa-facebook-f text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram">
+                        <i class="fab fa-instagram text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok">
+                        <i class="fab fa-tiktok text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <p class="text-sm mt-8 pt-4 w-full text-center">
+            Copyright © NTA MODELS | All Rights Reserved | Web Designs by 
+            <a href="https://webbytlotly.netlify.app/" target="_blank" class="hover:text-gray-400 transition text-white no-underline">Tlotly</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    // ------------------------------------------------------------------
+    // Menu Toggle Logic
+    // ------------------------------------------------------------------
+    const hamburgerMobile = document.getElementById('hamburger-mobile');
+    const hamburgerDesktop = document.getElementById('hamburger-desktop');
+    const sideMenu = document.getElementById('side-menu');
+
+    function toggleMenu() {
+        const isOpen = sideMenu.classList.toggle('open');
+        
+        if (hamburgerMobile) {
+             hamburgerMobile.classList.toggle('open', isOpen);
+        }
+        if (hamburgerDesktop) {
+            hamburgerDesktop.classList.toggle('open', isOpen);
+        }
+
+        document.body.classList.toggle('overflow-hidden', isOpen); 
+    }
+
+    if (hamburgerMobile) {
+        hamburgerMobile.addEventListener('click', toggleMenu);
+    }
+    if (hamburgerDesktop) {
+        hamburgerDesktop.addEventListener('click', toggleMenu);
+    }
+
+    document.querySelectorAll('.side-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (sideMenu.classList.contains('open')) {
+                toggleMenu();
+            }
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (sideMenu.classList.contains('open') && window.innerWidth >= 640) {
+            sideMenu.classList.remove('open');
+            if (hamburgerDesktop) hamburgerDesktop.classList.remove('open');
+            if (hamburgerMobile) hamburgerMobile.classList.remove('open');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+</script>
+</body>
+</html>
