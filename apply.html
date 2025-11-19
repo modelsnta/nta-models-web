@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Scouted | NTA Models SA</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for Social Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /*
+        * ----------------------------------------------------
+        * 1. Font Definitions and Utility Classes
+        * ----------------------------------------------------
+        */
+        /* Using Playfair Display (Serif/Bodoni) and Montserrat (Sans-serif) */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;700&display=swap');
+
+        /* Custom Fonts */
+        .font-bodoni { font-family: 'Playfair Display', serif; font-weight: 400; }
+        .font-montserrat-light { font-family: 'Montserrat', sans-serif; font-weight: 300; }
+        .font-montserrat-bold { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+        
+        /* General site styling: Pure White Background, Pure Black Text */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FFFFFF;
+            padding-top: 80px; 
+        }
+
+        /* Color Overrides */
+        .text-black { color: #000000 !important; }
+        .text-white-override * { color: #FFFFFF !important; }
+        .text-white { color: #FFFFFF !important; }
+        
+        /*
+        * ----------------------------------------------------
+        * 2. Header and Menu Styles
+        * ----------------------------------------------------
+        */
+        #main-header { z-index: 9999; box-shadow: none; border-bottom: none; }
+        .hamburger-line { display: block; width: 30px; height: 2px; background-color: #000000; margin: 6px 0; transition: all 0.3s ease-in-out; border-radius: 9999px; }
+        .hamburger.open .hamburger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.open .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger.open .hamburger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        .side-menu { position: fixed; top: 0; left: -100vw; width: 100vw; height: 100vh; background-color: #FFFFFF; z-index: 9998; transition: left 0.3s ease-in-out; overflow-y: auto; padding: 2rem; padding-top: 100px; }
+        .side-menu.open { left: 0; }
+        .side-menu-content { display: flex; flex-direction: column; align-items: center; } 
+        .menu-item { position: relative; display: block; text-align: center; text-decoration: none; transition: color 0.15s ease; width: fit-content; margin: 0 auto; }
+        .menu-item::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); bottom: -2px; width: 0; height: 2px; background-color: #000000; transition: width 0.3s ease-in-out; }
+        .menu-item:hover::after { width: 100%; }
+        .menu-group-1 a { font-size: 1.5rem; padding: 8px 0; line-height: 1.2; font-weight: 400; }
+        .menu-group-2 a { font-size: 1.15rem; padding: 6px 0; font-weight: 300; }
+        .character-text { letter-spacing: 0.15em; display: inline-block; }
+        .character-text span:nth-child(1) { color: #FF0000 !important; } 
+        .character-text span:nth-child(2) { color: #00A651 !important; } 
+        .character-text span:nth-child(3) { color: #0000FF !important; } 
+        .character-text span:nth-child(4) { color: #FFD700 !important; } 
+        .character-text span:nth-child(5) { color: #8A2BE2 !important; } 
+        .character-text span:nth-child(6) { color: #FF4500 !important; } 
+        .character-text span:nth-child(7) { color: #1E90FF !important; } 
+        .character-text span:nth-child(8) { color: #DC143C !important; } 
+        .character-text span:nth-child(9) { color: #3CB371 !important; } 
+
+        /*
+        * ----------------------------------------------------
+        * 3. Apply Page Custom Styles
+        * ----------------------------------------------------
+        */
+        /* Thin black border for form fields, radio, and checkboxes */
+        .form-input-border {
+            border-width: 1px;
+            border-color: #000000;
+        }
+
+        /* Automatic Slideshow Container (Fixed size requirement) */
+        @keyframes slideshow-auto {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* Slides 3 images (6 total for loop) */
+        }
+        .slideshow-container {
+            width: 100%;
+            height: 312px; /* Fixed height */
+            overflow: hidden; 
+        }
+        .slideshow-track {
+            display: flex;
+            width: calc(820px * 6); /* 3 images * 2 sets for looping */
+            animation: slideshow-auto 30s linear infinite;
+        }
+        .slideshow-item {
+            flex: 0 0 auto;
+            width: 820px; /* Fixed width as requested */
+            height: 312px;
+        }
+
+        /* Photo Submission Gallery (Scrollable on mobile) */
+        .photo-gallery {
+            overflow-x: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+        .photo-item {
+            flex: 0 0 250px; /* Fixed width for each image container */
+        }
+        
+        /* Custom Checkbox Styling */
+        .custom-checkbox:checked {
+            background-color: #000000;
+            border-color: #000000;
+        }
+        .custom-checkbox {
+            border-color: #000000;
+            border-radius: 0;
+            height: 1.25rem;
+            width: 1.25rem;
+        }
+
+        /* Custom Radio Styling */
+        .custom-radio {
+            border-color: #000000;
+        }
+        .custom-radio:checked {
+            border-color: #000000;
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+
+<!-- FIXED HEADER (Z-index: 9999) -->
+<header id="main-header" class="fixed top-0 left-0 w-full bg-white h-20">
+
+    <!-- Mobile View -->
+    <div class="flex justify-between items-center h-full px-4 sm:hidden">
+        <button id="hamburger-mobile" class="hamburger p-2">
+            <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+        </button>
+        <div class="flex-grow flex justify-center">
+            <img src="assets/logo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/200x45/000000/FFFFFF?text=NTA+LOGO'" 
+                 alt="NTA Models Logo" class="logo h-12 w-auto max-w-[200px]">
+        </div>
+        <div class="w-10"></div>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="hidden sm:flex justify-between items-center h-full px-10">
+        <nav class="flex items-center space-x-4">
+            <a href="agency/index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">AGENCY</a>
+            <span class="text-black text-sm font-montserrat-light">|</span>
+            <a href="academy/index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">ACADEMY</a>
+        </nav>
+        <div class="flex-shrink-0">
+            <img src="assets/logo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/180x40/000000/FFFFFF?text=NTA+LOGO'" 
+                 alt="NTA Models Logo" class="logo h-12 w-auto">
+        </div>
+        <nav class="flex items-center space-x-4">
+            <a href="contact.html" class="font-montserrat-light text-sm uppercase menu-item text-black">CONTACT</a>
+            <a href="apply.html" class="font-montserrat-light text-sm uppercase menu-item text-black">GET SCOUTED</a>
+            <button id="hamburger-desktop" class="hamburger p-2 ml-4">
+                <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+            </button>
+        </nav>
+    </div>
+</header>
+
+<!-- SIDE MENU -->
+<div id="side-menu" class="side-menu">
+    <div class="side-menu-content">
+        <div class="space-y-1 mb-6 menu-group-1">
+            <a href="agency/index.html" class="menu-item font-bodoni uppercase text-black">AGENCY</a>
+            <a href="academy/index.html" class="menu-item font-bodoni uppercase text-black">ACADEMY</a>
+            <a href="character/index.html" class="menu-item font-bodoni uppercase text-black">
+                <span class="character-text">
+                    <span>C</span><span>H</span><span>A</span><span>R</span><span>A</span><span>C</span><span>T</span><span>E</span><span>R</span>
+                </span>
+            </a>
+            <a href="apply.html" class="menu-item font-bodoni uppercase text-black">GET SCOUTED</a>
+            <a href="contact.html" class="menu-item font-bodoni uppercase text-black">CONTACT</a>
+        </div>
+        <div class="space-y-1 menu-group-2">
+            <a href="index.html" class="menu-item font-montserrat-light uppercase text-black">HOME</a>
+            <a href="about.html" class="menu-item font-montserrat-light uppercase text-black">ABOUT</a>
+            <a href="bookings.html" class="menu-item font-montserrat-light uppercase text-black">BOOKINGS</a>
+            <a href="FAQS.html" class="menu-item font-montserrat-light uppercase text-black">FAQS</a>
+            <a href="news.html" class="menu-item font-montserrat-light uppercase text-black">NEWS</a>
+        </div>
+        <div class="social-icons-row mt-6">
+            <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook" class="mx-3"><i class="fab fa-facebook-f text-2xl text-black"></i></a>
+            <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram" class="mx-3"><i class="fab fa-instagram text-2xl text-black"></i></a>
+            <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok" class="mx-3"><i class="fab fa-tiktok text-2xl text-black"></i></a>
+            <a href="mailto:info@ntamodels.co.za" aria-label="Email" class="mx-3"><i class="fas fa-envelope text-2xl text-black"></i></a>
+            <a href="tel:+27780093318" aria-label="Phone" class="mx-3"><i class="fas fa-phone text-2xl text-black"></i></a>
+        </div>
+    </div>
+</div>
+
+<main class="bg-white">
+    
+    <!-- 1. IMAGE SLIDESHOW (NOW AUTOMATIC) -->
+    <section class="py-4">
+        <div class="slideshow-container bg-gray-100">
+            <div class="slideshow-track">
+                <!-- Set 1 (Using assets/m8.jpg to assets/m10.jpg) -->
+                <div class="slideshow-item">
+                    <img src="assets/m8.jpg" onerror="this.onerror=null;this.src='https://placehold.co/820x312/D1D5DB/1F2937?text=MODEL+8'" alt="Model Portfolio Slide 8" class="w-full h-full object-cover">
+                </div>
+                <div class="slideshow-item">
+                    <img src="assets/m9.jpg" onerror="this.onerror=null;this.src='https://placehold.co/820x312/D1D5DB/1F2937?text=MODEL+9'" alt="Model Portfolio Slide 9" class="w-full h-full object-cover">
+                </div>
+                <div class="slideshow-item">
+                    <img src="assets/m11.jpg" onerror="this.onerror=null;this.src='https://placehold.co/820x312/D1D5DB/1F2937?text=MODEL+10'" alt="Model Portfolio Slide 10" class="w-full h-full object-cover">
+                </div>
+                <!-- Set 2 (for looping) -->
+                 <div class="slideshow-item">
+                    <img src="assets/m8.jpg" onerror="this.onerror=null;this.src='https://placehold.co/820x312/D1D5DB/1F2937?text=MODEL+8'" alt="Model Portfolio Slide 8" class="w-full h-full object-cover">
+                </div>
+                <div class="slideshow-item">
+                    <img src="assets/m9.jpg" onerror="this.onerror=null;this.src='https://placehold.co/820x312/D1D5DB/1F2937?text=MODEL+9'" alt="Model Portfolio Slide 9" class="w-full h-full object-cover">
+                </div>
+                <div class="slideshow-item">
+                    <img src="assets/m11.jpg" onerror="this.onerror=null;this.src='https://placehold.co/820x312/D1D5DB/1F2937?text=MODEL+10'" alt="Model Portfolio Slide 10" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MARQUEE WARNING TEXT -->
+    <section class="py-2 px-0 bg-white">
+        <div class="text-base sm:text-lg font-montserrat-light uppercase text-black overflow-hidden">
+            <!-- Marquee is used for the requested scrolling text effect -->
+            <marquee behavior="scroll" direction="left" scrollamount="8">
+                <span class="text-black pr-8">|</span> 
+                <!-- Bold and red only on the word "WARNING:" -->
+                <span class="font-montserrat-bold text-red-700">WARNING:</span>
+                <!-- The rest is light font and black (inherited from div) -->
+                &nbsp;NTA MODELS PRIORITIZES THE SAFETY OF ASPIRING MODELS AND TALENT. THEREFORE, NTA MODELS WILL NEVER CHARGE OR REQUEST ANY FEE TO PROCESS YOUR APPLICATION. PLEASE BE VIGILANT OF SCAMS CLAIMING TO BE US. ALL OUR DETAILS ARE IN THE NTAMODELS.CO.ZA DOMAIN, NOT ANY OTHER DOMAIN. IF YOU SUSPECT ANY SCAM OR PERSON PRETENDING TO BE A SCOUT FOR NTA MODELS, PLEASE IMMEDIATELY EMAIL 
+                <a href="mailto:alert@ntamodels.co.za" class="underline text-black hover:text-gray-700">ALERT@NTAMODELS.CO.ZA</a> OR CALL 
+                <a href="tel:+27780093318" class="underline text-black hover:text-gray-700">+27 78 009 3318</a>. | PLEASE NOTE: NTA MODELS WILL NEVER REQUEST PHOTOS IN THE NUDE OR LINGERIE, NOR WILL WE REQUEST PAYMENT FOR REGISTRATION OR CASTINGS. STAY SAFE AND MINDFUL. 
+                <span class="text-black pl-8">|</span>
+            </marquee>
+        </div>
+    </section>
+
+    <!-- 2. GET SCOUTED HEADING & DIVERSITY PARAGRAPH -->
+    <section class="py-12 px-6 lg:px-20 bg-white max-w-4xl mx-auto">
+        
+        <!-- Section Heading: ---- GET SCOUTED ---- -->
+        <div class="flex items-center justify-center mb-6">
+            <div class="h-px bg-black flex-grow w-16 sm:w-20"></div>
+            <h2 class="font-montserrat-light text-black uppercase text-2xl sm:text-3xl mx-6 whitespace-nowrap tracking-wider">Get Scouted</h2>
+            <div class="h-px bg-black flex-grow w-16 sm:w-20"></div>
+        </div>
+
+        <!-- Paragraph -->
+        <p class="font-montserrat-light text-lg text-center leading-relaxed">
+            At NTA <span class="font-bodoni">Models</span>, we take pride in diversity, and wholeheartedly support the global movement for inclusion, providing everyone with the chance to shine regardless of height, age, gender, race, or size.
+        </p>
+    </section>
+
+    <!-- 3. SUBMISSION GUIDELINES -->
+    <section class="py-12 px-6 lg:px-20 bg-white max-w-4xl mx-auto">
+        
+        <!-- Header: --- Submission Guideline: -->
+        <div class="flex items-center justify-start mb-6">
+            <div class="h-px bg-black flex-grow-0 w-8 sm:w-10"></div>
+            <h3 class="font-montserrat-light text-black uppercase text-xl sm:text-2xl ml-4 mr-6 whitespace-nowrap tracking-wider">Submission Guideline:</h3>
+            <div class="h-px bg-black flex-grow"></div>
+        </div>
+
+        <!-- Numbered List -->
+        <ol class="font-montserrat-light text-black text-base list-decimal ml-8 space-y-3">
+            <li>Models / Talent under age should have guardian or parent consent.</li>
+            <li>All experienced models should include their portfolio or Instagram for the team to review.</li>
+            <li>If a model attended our academy, there's no need to apply as we will contact you if we want to represent you.</li>
+            <li>It takes 5 - 7 working days for us to give you feedback. Whether your application is successful or unsuccessful, we will contact you.</li>
+            <li>We use Google Drive to see your pictures. Applications without the Google Drive link will not be considered.</li>
+            <li>To enroll at our academy, visit the <a href="academy/enroll.html" class="font-montserrat-bold text-black underline hover:no-underline">ENROLL</a> page.</li>
+        </ol>
+    </section>
+
+    <!-- 4. PHOTO SUBMISSION GUIDELINES & EXAMPLES -->
+    <section class="py-12 px-6 lg:px-20 bg-white max-w-4xl mx-auto">
+        
+        <!-- Header: --- PHOTO SUBMISSION: -->
+        <div class="flex items-center justify-start mb-6">
+            <div class="h-px bg-black flex-grow-0 w-8 sm:w-10"></div>
+            <h3 class="font-montserrat-light text-black uppercase text-xl sm:text-2xl ml-4 mr-6 whitespace-nowrap tracking-wider">PHOTO SUBMISSION:</h3>
+            <div class="h-px bg-black flex-grow"></div>
+        </div>
+
+        <!-- Photo Instructions -->
+        <div class="font-montserrat-light text-black text-base space-y-4 mb-8">
+            <p><span class="font-montserrat-bold uppercase">HEADSHOT:</span> Please supply a clear portrait shot of your face and shoulders (no sunglasses or hats) and please do not wear any make up.</p>
+            <p><span class="font-montserrat-bold uppercase">PROFILE:</span> Either side of your face.</p>
+            <p><span class="font-montserrat-bold uppercase">WAIST UP:</span> Please try take this against a plain background.</p>
+            <p><span class="font-montserrat-bold uppercase">FULL LENGTH:</span> Please try take this against a plain background.</p>
+            <p><span class="font-montserrat-bold uppercase">GOOGLE DRIVE:</span> Upload your photos to Google Drive and share the link. Paste it along with your application Or email them to <a href="mailto:models@ntamodels.co.za" class="underline">models@ntamodels.co.za</a></p>
+        </div>
+
+        <!-- Scrollable Image Row -->
+        <div class="photo-gallery flex space-x-4 pb-4">
+            <!-- Headshot -->
+            <div class="photo-item text-center">
+                <img src="assets/h1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x375/D1D5DB/1F2937?text=HEADSHOT'" alt="Headshot Example" class="w-full h-auto object-cover form-input-border">
+                <p class="font-montserrat-light text-sm mt-2">Headshot</p>
+            </div>
+            <!-- Profile -->
+            <div class="photo-item text-center">
+                <img src="assets/h2.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x375/D1D5DB/1F2937?text=PROFILE'" alt="Profile Example" class="w-full h-auto object-cover form-input-border">
+                <p class="font-montserrat-light text-sm mt-2">Profile</p>
+            </div>
+            <!-- Waist Up -->
+            <div class="photo-item text-center">
+                <img src="assets/h3.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x375/D1D5DB/1F2937?text=WAIST+UP'" alt="Waist Up Example" class="w-full h-auto object-cover form-input-border">
+                <p class="font-montserrat-light text-sm mt-2">Waist Up</p>
+            </div>
+            <!-- Full Length -->
+            <div class="photo-item text-center">
+                <img src="assets/h4.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x375/D1D5DB/1F2937?text=FULL+LENGTH'" alt="Full Length Example" class="w-full h-auto object-cover form-input-border">
+                <p class="font-montserrat-light text-sm mt-2">Full Length</p>
+            </div>
+        </div>
+
+        <!-- Closing Note -->
+        <p class="font-montserrat-light text-sm mt-8 text-center sm:text-left">
+            Please keep your submission photographs as clear and simple as possible; no retouching or professional images are required, images taken with your phone are fine. Please don’t include other people in your submission photographs, we only want to see you.
+        </p>
+    </section>
+
+    <!-- 5. APPLICATION FORM -->
+    <section class="py-12 px-6 lg:px-20 bg-white max-w-xl mx-auto">
+        
+        <!-- Form Title: ---- APPLY ---- -->
+        <div class="flex items-center justify-center mb-4">
+            <div class="h-px bg-black flex-grow w-16 sm:w-20"></div>
+            <h2 class="font-montserrat-light text-black uppercase text-3xl sm:text-4xl mx-6 whitespace-nowrap tracking-wider">Apply</h2>
+            <div class="h-px bg-black flex-grow w-16 sm:w-20"></div>
+        </div>
+        
+        <p class="text-center text-sm font-montserrat-light mb-8">Form fields with an asterisk (*) mean required.</p>
+
+            <form action="https://formspree.io/f/xanaplrw" method="POST" class="space-y-6">
+                
+                <!-- Basic Details -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="text" name="First Name" placeholder="First Name *" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                    <input type="text" name="Last Name" placeholder="Last Name *" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                </div>
+                <input type="email" name="Email" placeholder="Email *" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                <input type="tel" name="Phone Number" placeholder="Phone Number *" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+
+                <!-- Age/DOB -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base text-gray-400 focus-within:ring-1 focus-within:ring-black">
+                        <label for="dob" class="text-xs text-black block mb-1">Date of Birth *</label>
+                        <input type="date" id="dob" name="Date of Birth" required class="w-full text-black bg-white border-none p-0 m-0 focus:outline-none">
+                    </div>
+                    <input type="number" name="Age" placeholder="Age *" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                </div>
+
+                <!-- Gender & Ethnicity -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <select name="Gender" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                        <option value="" disabled selected>Gender *</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Non Binary">Non Binary</option>
+                        <option value="Prefer Not to Say">Prefer Not to Say</option>
+                    </select>
+                    <select name="Ethnicity" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                        <option value="" disabled selected>Ethnicity *</option>
+                        <option value="African">African</option>
+                        <option value="Asian">Asian</option>
+                        <option value="Black/African Descent">Black / African Descent</option>
+                        <option value="East Asian">East Asian</option>
+                        <option value="First Nations">First Nations / Indigenous</option>
+                        <option value="Hispanic/Latino">Hispanic / Latino</option>
+                        <option value="Middle Eastern">Middle Eastern</option>
+                        <option value="Mixed/Multi-racial">Mixed / Multi-racial</option>
+                        <option value="Pacific Islander">Pacific Islander</option>
+                        <option value="South Asian">South Asian</option>
+                        <option value="White/Caucasian">White / Caucasian</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Location & Google Drive -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <select name="Location" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                        <option value="" disabled selected>Location *</option>
+                        <option value="Local (South Africa)">Local (South Africa)</option>
+                        <option value="International">International</option>
+                    </select>
+                    <input type="url" name="Google Drive link" placeholder="Google Drive Link (Photos) *" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                </div>
+
+                <!-- Social Media -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="text" name="Instagram" placeholder="Instagram (@username)" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                    <input type="text" name="Facebook" placeholder="Facebook (Link)" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                </div>
+
+                <!-- Measurements and Appearance -->
+                <h4 class="font-montserrat-light text-lg uppercase pt-4">Measurements & Appearance</h4>
+                <input type="text" name="Height" placeholder="Height * (e.g., 175cm or 5'9&quot;)" required class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <input type="text" name="Bust" placeholder="Bust" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                    <input type="text" name="Waist" placeholder="Waist" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                    <input type="text" name="Shoe Size" placeholder="Shoe" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                    <input type="text" name="Hair Color" placeholder="Hair Color" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                </div>
+                <input type="text" name="Eye Color" placeholder="Eye Color" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+
+                <!-- Skills / Academy Questions -->
+                <input type="text" name="Skills/Talent" placeholder="Any skills / Talent" class="form-input-border w-full p-3 rounded-none font-montserrat-light text-base focus:outline-none focus:ring-1 focus:ring-black">
+                
+                <!-- Did you attend NTA Academy? -->
+                <div class="pt-4">
+                    <label class="font-montserrat-light text-black block mb-2">Did you attend NTA Academy? *</label>
+                    <div class="flex space-x-6">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="Attended Academy" value="Yes" required class="custom-radio form-radio text-black">
+                            <span class="ml-2 font-montserrat-light">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="Attended Academy" value="No" required class="custom-radio form-radio text-black">
+                            <span class="ml-2 font-montserrat-light">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Referred to academy? -->
+                <div class="pt-4">
+                    <label class="font-montserrat-light text-black block mb-2">Do you want to be referred to the academy if potential is witnessed in you by our scout? *</label>
+                    <div class="flex space-x-6">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="Refer to Academy" value="Yes" required class="custom-radio form-radio text-black">
+                            <span class="ml-2 font-montserrat-light">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="Refer to Academy" value="No" required class="custom-radio form-radio text-black">
+                            <span class="ml-2 font-montserrat-light">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 6. ACKNOWLEDGMENT SECTION -->
+                <div class="pt-8">
+                    <div class="flex items-center justify-start mb-6">
+                        <div class="h-px bg-black flex-grow-0 w-8 sm:w-10"></div>
+                        <h3 class="font-montserrat-light text-black uppercase text-xl sm:text-2xl ml-4 mr-6 whitespace-nowrap tracking-wider">Acknowledgment</h3>
+                        <div class="h-px bg-black flex-grow"></div>
+                    </div>
+
+                    <div class="space-y-4 font-montserrat-light text-base">
+                        <!-- Acknowledgment 1: Privacy Policy -->
+                        <label class="flex items-start space-x-3">
+                            <input type="checkbox" name="Accepted Privacy Policy" value="Yes" required class="custom-checkbox mt-1 form-checkbox text-black">
+                            <span>I have read and accepted NTA Model's <a href="#" class="underline text-black hover:no-underline">Privacy Policy</a>.</span>
+                        </label>
+                        
+                        <!-- Acknowledgment 2: Data Processing -->
+                        <label class="flex items-start space-x-3">
+                            <input type="checkbox" name="Accepted Data Processing" value="Yes" required class="custom-checkbox mt-1 form-checkbox text-black">
+                            <span>I herby grant NTA Models permission to process my data for the purpose of assessing my potential as a model/performer, and to utilize the information provided to contact me.</span>
+                        </label>
+
+                        <!-- Acknowledgment 3: Age Confirmation -->
+                        <label class="flex items-start space-x-3">
+                            <input type="checkbox" name="Age Confirmation" value="Yes" required class="custom-checkbox mt-1 form-checkbox text-black">
+                            <span>I acknowledge that I am at least 18 years of age. If not, it is necessary to obtain the consent of a parent or guardian before proceeding.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" 
+                        class="bg-black text-white uppercase font-montserrat-light w-full py-4 text-lg rounded-none hover:bg-gray-800 transition">
+                    Send Application
+                </button>
+
+                <!-- reCAPTCHA Disclaimer -->
+                <p class="text-xs text-center text-gray-500 font-montserrat-light pt-2">
+                    This site is protected by reCAPTCHA and the Google 
+                    <a href="https://policies.google.com/privacy" target="_blank" class="hover:underline">Privacy Policy</a> and 
+                    <a href="https://policies.google.com/terms" target="_blank" class="hover:underline">Terms of Service</a> apply.
+                </p>
+            </form>
+    </section>
+
+</main>
+
+<!-- FOOTER (Black Background, White Text, Fixed Visibility) -->
+<footer class="bg-black p-8 md:p-12 font-montserrat-light text-white-override">
+    <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+        
+        <!-- Large centered image logo -->
+        <img src="assets/logo2.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x60/FFFFFF/000000?text=NTA+LOGO+2'" 
+             alt="NTA Models Footer Logo" class="h-16 w-auto mb-6">
+
+        <!-- Footer Navigation -->
+        <div class="mb-10 flex flex-wrap justify-center space-x-4 sm:space-x-8">
+            <a href="agency/index.html" class="font-montserrat-bold uppercase text-white hover:text-gray-400 transition whitespace-nowrap">AGENCY</a>
+            <a href="academy/index.html" class="font-montserrat-bold uppercase text-white hover:text-gray-400 transition whitespace-nowrap">ACADEMY</a>
+            <a href="apply.html" class="font-montserrat-bold uppercase text-white hover:text-gray-400 transition whitespace-nowrap">GET SCOUTED</a>
+        </div>
+
+        <!-- Content columns -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 text-center md:text-left">
+            
+            <!-- 1. Office Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-bold uppercase mb-2 text-lg text-white">Office:</h3>
+                <p class="mb-1">Cape Town, South Africa</p>
+                <p class="mb-4">Bloemfontein, Free State</p>
+                <p class="flex items-center mb-1">
+                    <i class="fas fa-phone mr-3 text-white"></i>
+                    +27 78 009 3318
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-envelope mr-3 text-white"></i>
+                    info@ntamodels.co.za
+                </p>
+            </div>
+
+            <!-- 2. Operating Hours Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-bold uppercase mb-2 text-lg text-white">Operating Hours:</h3>
+                <p>Monday - Friday (08:30 - 17:00)</p>
+                <p>Saturday (08:30 - 13:00)</p>
+                <p>Sunday (Closed)</p>
+                <p>Public Holidays (Appointment Only)</p>
+            </div>
+
+            <!-- 3. Follow Us Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-bold uppercase mb-4 text-lg text-white">Follow us</h3>
+                <div class="flex space-x-6 justify-start">
+                    <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook">
+                        <i class="fab fa-facebook-f text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram">
+                        <i class="fab fa-instagram text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok">
+                        <i class="fab fa-tiktok text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <p class="text-sm mt-8 pt-4 w-full text-center">
+            Copyright © NTA MODELS | All Rights Reserved | Web Designs by 
+            <a href="https://webbytlotly.netlify.app/" target="_blank" class="hover:text-gray-400 transition text-white no-underline">Tlotly</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    // ------------------------------------------------------------------
+    // 1. Menu Toggle Logic
+    // ------------------------------------------------------------------
+    const hamburgerMobile = document.getElementById('hamburger-mobile');
+    const hamburgerDesktop = document.getElementById('hamburger-desktop');
+    const sideMenu = document.getElementById('side-menu');
+
+    function toggleMenu() {
+        const isOpen = sideMenu.classList.toggle('open');
+        
+        if (hamburgerMobile) {
+             hamburgerMobile.classList.toggle('open', isOpen);
+        }
+        if (hamburgerDesktop) {
+            hamburgerDesktop.classList.toggle('open', isOpen);
+        }
+
+        document.body.classList.toggle('overflow-hidden', isOpen); 
+    }
+
+    if (hamburgerMobile) {
+        hamburgerMobile.addEventListener('click', toggleMenu);
+    }
+    if (hamburgerDesktop) {
+        hamburgerDesktop.addEventListener('click', toggleMenu);
+    }
+
+    document.querySelectorAll('.side-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (sideMenu.classList.contains('open')) {
+                toggleMenu();
+            }
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (sideMenu.classList.contains('open') && window.innerWidth >= 640) {
+            sideMenu.classList.remove('open');
+            if (hamburgerDesktop) hamburgerDesktop.classList.remove('open');
+            if (hamburgerMobile) hamburgerMobile.classList.remove('open');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+</script>
+</body>
+</html>
