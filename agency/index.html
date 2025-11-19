@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTA Agency | Editorial & High Fashion</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        /*
+        * ----------------------------------------------------
+        * 1. Font Definitions and Utility Classes
+        * ----------------------------------------------------
+        */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;700&display=swap');
+
+        /* Custom Fonts */
+        .font-bodoni { font-family: 'Playfair Display', serif; font-weight: 400; }
+        .font-bodoni-light { font-family: 'Playfair Display', serif; font-weight: 300; }
+        .font-montserrat-light { font-family: 'Montserrat', sans-serif; font-weight: 300; }
+        .font-montserrat-bold { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+        
+        /* General site styling: Pure White Background, Pure Black Text */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #FFFFFF;
+            padding-top: 80px; 
+            font-weight: 300; /* Defaulting body text to light */
+        }
+
+        /* Color Overrides */
+        .text-black { color: #000000 !important; }
+        .text-white-override * { color: #FFFFFF !important; }
+        .text-white { color: #FFFFFF !important; }
+        
+        /*
+        * ----------------------------------------------------
+        * 2. Header and Menu Styles
+        * ----------------------------------------------------
+        */
+        #main-header { z-index: 9999; box-shadow: none; border-bottom: none; }
+        .hamburger-line { display: block; width: 30px; height: 2px; background-color: #000000; margin: 6px 0; transition: all 0.3s ease-in-out; border-radius: 9999px; }
+        .hamburger.open .hamburger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.open .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger.open .hamburger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        .side-menu { position: fixed; top: 0; left: -100vw; width: 100vw; height: 100vh; background-color: #FFFFFF; z-index: 9998; transition: left 0.3s ease-in-out; overflow-y: auto; padding: 2rem; padding-top: 100px; }
+        .side-menu.open { left: 0; }
+        .side-menu-content { display: flex; flex-direction: column; align-items: center; } 
+        
+        /* Main menu item styling - Consolidated to meet 'Montserrat light' and 'capital letters' request for the new list */
+        .menu-item { 
+            position: relative; 
+            display: block; 
+            text-align: center; 
+            text-decoration: none; 
+            transition: color 0.15s ease; 
+            width: fit-content; 
+            margin: 0 auto;
+            font-size: 1.5rem; /* Larger size for primary links */
+            padding: 8px 0; 
+            line-height: 1.2; 
+            font-weight: 300; /* Montserrat Light */
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .menu-item::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); bottom: -2px; width: 0; height: 2px; background-color: #000000; transition: width 0.3s ease-in-out; }
+        .menu-item:hover::after { width: 100%; }
+        
+        /* Submenu item styling - smaller, still centered, capital letters */
+        .submenu-item {
+            font-size: 1.1rem; 
+            padding: 4px 0;
+            font-weight: 300;
+            opacity: 0.9;
+            width: fit-content;
+            margin: 0 auto; 
+        }
+
+        /* Submenu Container Styling for toggling visibility */
+        .submenu-container {
+            width: fit-content;
+            margin: 0 auto;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .submenu-container.open {
+            max-height: 100px; /* Sufficient space for the two items */
+            opacity: 1;
+        }
+        
+        /* Character Multi-Color Text Styling */
+        .character-text { letter-spacing: 0.15em; display: inline-block; }
+        .character-text span:nth-child(1) { color: #FF0000 !important; } /* Red */
+        .character-text span:nth-child(2) { color: #00A651 !important; } /* Green */
+        .character-text span:nth-child(3) { color: #0000FF !important; } /* Blue */
+        .character-text span:nth-child(4) { color: #FFD700 !important; } /* Yellow */
+        .character-text span:nth-child(5) { color: #8A2BE2 !important; } /* BlueViolet */
+        .character-text span:nth-child(6) { color: #FF4500 !important; } /* OrangeRed */
+        .character-text span:nth-child(7) { color: #1E90FF !important; } /* DodgerBlue */
+        .character-text span:nth-child(8) { color: #DC143C !important; } /* Crimson */
+        .character-text span:nth-child(9) { color: #3CB371 !important; } /* MediumSeaGreen */
+        
+        /*
+        * ----------------------------------------------------
+        * 3. Slideshow and Video Styles (Kept as is)
+        * ----------------------------------------------------
+        */
+        
+        .slideshow-container {
+            position: relative;
+            height: 60vh; 
+            min-height: 400px;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        .mySlides {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .mySlides.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .slideshow-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+            padding: 2rem;
+        }
+
+        .video-section {
+            position: relative;
+            width: 100%;
+            height: 60vh; 
+            min-height: 400px;
+            overflow: hidden;
+        }
+        .video-section video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+<!-- FIXED HEADER (Z-index: 9999) -->
+<header id="main-header" class="fixed top-0 left-0 w-full bg-white h-20">
+
+    <!-- Mobile View -->
+    <div class="flex justify-between items-center h-full px-4 sm:hidden">
+        <button id="hamburger-mobile" class="hamburger p-2">
+            <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+        </button>
+        <div class="flex-grow flex justify-center">
+            <!-- HEADER LOGO: ../assets/logo1.jpg -->
+            <img src="../assets/logo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/200x45/000000/FFFFFF?text=AGENCY+LOGO'" 
+                 alt="NTA Agency Logo" class="logo h-12 w-auto max-w-[200px]">
+        </div>
+        <div class="w-10"></div>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="hidden sm:flex justify-between items-center h-full px-10">
+        <nav class="flex items-center space-x-4">
+            <a href="index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">AGENCY</a>
+            <span class="text-black text-sm font-montserrat-light">|</span>
+            <a href="../academy/index.html" class="font-montserrat-light text-sm uppercase menu-item text-black">ACADEMY</a>
+        </nav>
+        <div class="flex-shrink-0">
+            <!-- HEADER LOGO: ../assets/logo1.jpg -->
+            <img src="../assets/logo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/180x40/000000/FFFFFF?text=AGENCY+LOGO'" 
+                 alt="NTA Agency Logo" class="logo h-12 w-auto">
+        </div>
+        <nav class="flex items-center space-x-4">
+            <a href="../contact.html" class="font-montserrat-light text-sm uppercase menu-item text-black">CONTACT</a>
+            <a href="../apply.html" class="font-montserrat-light text-sm uppercase menu-item text-black">GET SCOUTED</a>
+            <button id="hamburger-desktop" class="hamburger p-2 ml-4">
+                <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+            </button>
+        </nav>
+    </div>
+</header>
+
+<!-- SIDE MENU -->
+<div id="side-menu" class="side-menu">
+    <div class="side-menu-content">
+        
+        <!-- Consolidated Menu Group -->
+        <div class="space-y-1 mb-6">
+            
+            <!-- HOME -->
+            <a href="../index.html" class="menu-item uppercase text-black">HOME</a> 
+            
+            <!-- ABOUT -->
+            <a href="../about.html" class="menu-item uppercase text-black">ABOUT</a>
+            
+            <!-- WOMEN Toggle -->
+            <a href="#" id="women-toggle" class="menu-item uppercase text-black">WOMEN</a>
+            <!-- WOMEN Submenu -->
+            <div id="women-submenu" class="submenu-container space-y-1">
+                <a href="#" class="menu-item uppercase text-black submenu-item">MAINBOARD</a>
+                <a href="#" class="menu-item uppercase text-black submenu-item">DEVELOPMENT</a>
+            </div>
+
+            <!-- MEN Toggle -->
+            <a href="#" id="men-toggle" class="menu-item uppercase text-black">MEN</a>
+            <!-- MEN Submenu -->
+            <div id="men-submenu" class="submenu-container space-y-1">
+                <a href="#" class="menu-item uppercase text-black submenu-item">MAINBOARD</a>
+                <a href="#" class="menu-item uppercase text-black submenu-item">DEVELOPMENT</a>
+            </div>
+            
+            <!-- NOVICE -->
+            <a href="#" class="menu-item uppercase text-black">NOVICE</a>
+
+            <!-- YOUTH -->
+            <a href="#" class="menu-item uppercase text-black">YOUTH</a>
+
+            <!-- CHARACTER (Multi-Colored Letters) -->
+            <a href="../character/index.html" class="menu-item uppercase text-black">
+                <span class="character-text font-bodoni">
+                    <span>C</span><span>H</span><span>A</span><span>R</span><span>A</span><span>C</span><span>T</span><span>E</span><span>R</span>
+                </span>
+            </a>
+            
+            <!-- OTHER MAIN LINKS (Retained from previous structure for completeness) -->
+            <a href="../academy/index.html" class="menu-item uppercase text-black">ACADEMY</a>
+            <a href="../apply.html" class="menu-item uppercase text-black">GET SCOUTED</a>
+            <a href="../contact.html" class="menu-item uppercase text-black">CONTACT</a>
+        </div>
+        
+        <div class="social-icons-row mt-6">
+            <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook" class="mx-3"><i class="fab fa-facebook-f text-2xl text-black"></i></a>
+            <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram" class="mx-3"><i class="fab fa-instagram text-2xl text-black"></i></a>
+            <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok" class="mx-3"><i class="fab fa-tiktok text-2xl text-black"></i></a>
+            <a href="mailto:info@ntamodels.co.za" aria-label="Email" class="mx-3"><i class="fas fa-envelope text-2xl text-black"></i></a>
+            <a href="tel:+27780093318" aria-label="Phone" class="mx-3"><i class="fas fa-phone text-2xl text-black"></i></a>
+        </div>
+    </div>
+</div>
+
+<main class="bg-white">
+    <!-- 1. IMAGE SLIDESHOW SECTION -->
+    <section class="slideshow-container mb-12">
+        <!-- Image Paths: ../assets/a1.jpg to ../assets/a4.jpg -->
+        <img class="mySlides" src="../assets/m11.jpg" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/101010/FFFFFF?text=AGENCY+SLIDE+1'" alt="Agency Division Model 1">
+        <img class="mySlides" src="../assets/m12.jpg" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/292929/FFFFFF?text=AGENCY+SLIDE+2'" alt="Agency Division Model 2">
+        <img class="mySlides" src="../assets/m13.jpg" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/3d3d3d/FFFFFF?text=AGENCY+SLIDE+3'" alt="Agency Division Model 3">
+        <img class="mySlides" src="../assets/m14.jpg" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/4e4e4e/FFFFFF?text=AGENCY+SLIDE+4'" alt="Agency Division Model 4">
+        
+        <!-- Slideshow Overlay (No dark background) -->
+        <div class="slideshow-overlay">
+            <h1 class="font-bodoni-light text-6xl md:text-8xl uppercase tracking-widest leading-none mb-4 text-white">
+                AGENCY
+            </h1>
+            <h2 class="font-montserrat-light text-xl md:text-3xl text-white">
+                EDITORIAL | HIGH FASHION | INFLUENCE
+            </h2>
+        </div>
+    </section>
+
+    <!-- 2. INTRODUCTION PARAGRAPH -->
+    <section class="max-w-4xl mx-auto px-4 py-8 text-center">
+        <h3 class="font-bodoni-light text-2xl mb-6 tracking-wide text-black">
+            The Standard of NTA Agency
+        </h3>
+        
+        <p class="font-montserrat-light text-lg text-black leading-relaxed">
+            NTA Agency represents the pinnacle of modern modeling, focusing on Editorial and High Fashion placements across global markets. We nurture and manage talent with distinct runway appeal, compelling photographic presence, and the professional discipline required by top-tier designers and publications. Our models are the faces defining the next generation of fashion, embodying sophistication, versatility, and influence. From Mainboard professionals to promising Development talent, we ensure our models are prepared to excel on any international stage.
+        </p>
+    </section>
+
+    <!-- 3. FEATURE VIDEO SECTION -->
+    <section class="mb-12 relative video-section">
+        <!-- Video Path: ../assets/agency.mp4 -->
+        <video id="agency-video" src="../hero-1.mp4" autoplay loop muted playsinline class="w-full h-full object-cover">
+            Your browser does not support the video tag.
+        </video>
+        
+        <!-- Video Overlay (No dark background) -->
+        <div class="video-overlay">
+            <div class="font-bodoni text-8xl md:text-[10rem] tracking-wider leading-none mb-3 uppercase text-white">
+                RUNWAY
+            </div>
+            <h2 class="font-montserrat-light text-xl md:text-3xl text-white">
+                The future of fashion starts here
+            </h2>
+        </div>
+    </section>
+
+    <!-- 4. DIVISION DETAILS SECTION -->
+    <section class="max-w-4xl mx-auto px-4 py-8">
+        <p class="font-montserrat-light text-center text-lg text-black mb-10">
+            Our Agency divisions are meticulously organized to ensure specialized management and focused career growth for every model, regardless of their stage in the industry.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- WOMEN & MEN MAINBOARD / DEVELOPMENT -->
+            <div class="border-l-4 border-black pl-4">
+                <h4 class="font-bodoni text-3xl mb-3 text-black">Women & Men:</h4>
+                <p class="font-montserrat-bold text-xl mb-1 text-black">Mainboard & Development</p>
+                <p class="font-montserrat-light text-black text-base leading-relaxed mb-4">
+                    Our Mainboard is home to established professionals working consistently in high fashion and major commercial campaigns. Development focuses on nurturing new talent, providing comprehensive training, portfolio development, and market preparation to transition them successfully onto the main roster.
+                </p>
+            </div>
+
+            <!-- NOVICE -->
+            <div class="border-l-4 border-black pl-4">
+                <h4 class="font-bodoni text-3xl mb-3 text-black">Novice:</h4>
+                <p class="font-montserrat-bold text-xl mb-1 text-black">First Steps into Professional Modeling</p>
+                <p class="font-montserrat-light text-black text-base leading-relaxed mb-4">
+                    The Novice division is dedicated to individuals just beginning their journey. We offer guidance on basic industry standards, scouting opportunities, and foundational confidence building, bridging the gap between amateur interest and serious career pursuit.
+                </p>
+            </div>
+
+            <!-- YOUTH -->
+            <div class="border-l-4 border-black pl-4">
+                <h4 class="font-bodoni text-3xl mb-3 text-black">Youth:</h4>
+                <p class="font-montserrat-bold text-xl mb-1 text-black">Future Generations of Talent</p>
+                <p class="font-montserrat-light text-black text-base leading-relaxed">
+                    The Youth division manages models under the age of 18, ensuring professional work is balanced with legal and educational requirements. We focus on building a safe, supportive environment for young talent to gain experience in commercial and fashion sectors.
+                </p>
+            </div>
+             
+            <!-- Blank Div for layout balance, since Influence was removed -->
+            <div></div>
+
+        </div>
+    </section>
+
+    <!-- 5. CALL TO ACTION SECTION (CTA) -->
+    <section class="h-[400px] flex items-center justify-center text-center px-4 mb-12 relative" 
+             style="background-image: url('../assets/m14.jpg'); background-size: cover; background-position: center; background-attachment: fixed;"
+             onerror="this.style.backgroundImage='url(\'https://placehold.co/1200x400/000000/FFFFFF?text=FASHION+CTA+BACKGROUND\')'">
+        <div class="absolute inset-0 bg-black opacity-60"></div>
+        <div class="relative z-10 p-6 rounded-lg">
+            <!-- Title: Are you ready for the Mainboard? -->
+            <h2 class="font-bodoni-light text-3xl md:text-5xl mb-8 uppercase text-white tracking-wide font-light">
+                Are you ready for the Mainboard?
+            </h2>
+            
+            <!-- Button linked to apply.html (Square, Transparent, White Border, White Text) -->
+            <a href="../apply.html" class="inline-block py-3 px-10 bg-transparent border-2 border-white text-white font-montserrat-bold uppercase text-lg rounded-none hover:bg-white hover:text-black transition duration-300">
+                APPLY NOW
+            </a>
+        </div>
+    </section>
+</main>
+
+<!-- FOOTER (Black Background, White Text) -->
+<footer class="bg-black p-8 md:p-12 font-montserrat-light text-white-override">
+    <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+        
+        <!-- FOOTER LOGO: ../assets/logo2.jpg -->
+        <img src="../assets/logo2.jpg" onerror="this.onerror=null;this.src='https://placehold.co/250x60/FFFFFF/000000?text=AGENCY+LOGO+2'" 
+             alt="NTA Agency Footer Logo" class="h-16 w-auto mb-6">
+
+        <!-- Footer Navigation -->
+        <div class="mb-10 flex flex-wrap justify-center space-x-4 sm:space-x-8">
+            <a href="index.html" class="font-montserrat-light uppercase text-white hover:text-gray-400 transition whitespace-nowrap">AGENCY</a>
+            <a href="../academy/index.html" class="font-montserrat-light uppercase text-white hover:text-gray-400 transition whitespace-nowrap">ACADEMY</a>
+            <a href="../apply.html" class="font-montserrat-light uppercase text-white hover:text-gray-400 transition whitespace-nowrap">GET SCOUTED</a>
+        </div>
+
+        <!-- Content columns -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 text-center md:text-left">
+            
+            <!-- 1. Office Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-light uppercase mb-2 text-lg text-white">Office:</h3>
+                <p class="mb-1">Cape Town, South Africa</p>
+                <p class="mb-4">Bloemfontein, Free State</p>
+                <p class="flex items-center mb-1">
+                    <i class="fas fa-phone mr-3 text-white"></i>
+                    +27 78 009 3318
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-envelope mr-3 text-white"></i>
+                    info@ntamodels.co.za
+                </p>
+            </div>
+
+            <!-- 2. Operating Hours Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-light uppercase mb-2 text-lg text-white">Operating Hours:</h3>
+                <p>Monday - Friday (08:30 - 17:00)</p>
+                <p>Saturday (08:30 - 13:00)</p>
+                <p>Sunday (Closed)</p>
+                <p>Public Holidays (Appointment Only)</p>
+            </div>
+
+            <!-- 3. Follow Us Section -->
+            <div class="mb-4 md:mb-0 max-w-sm mx-auto md:mx-0 w-full text-left">
+                <h3 class="font-montserrat-light uppercase mb-4 text-lg text-white">Follow us</h3>
+                <div class="flex space-x-6 justify-start">
+                    <a href="https://www.facebook.com/ntamodelsBFN" target="_blank" aria-label="Facebook">
+                        <i class="fab fa-facebook-f text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.instagram.com/ntamodelssa" target="_blank" aria-label="Instagram">
+                        <i class="fab fa-instagram text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@ntamodelssa" target="_blank" aria-label="TikTok">
+                        <i class="fab fa-tiktok text-2xl text-white hover:text-gray-400 transition"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <p class="text-sm mt-8 pt-4 w-full text-center">
+            Copyright © NTA MODELS | All Rights Reserved | Web Designs by 
+            <a href="https://webbytlotly.netlify.app/" target="_blank" class="hover:text-gray-400 transition text-white no-underline">Tlotly</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    // ------------------------------------------------------------------
+    // Menu Toggle Logic
+    // ------------------------------------------------------------------
+    const hamburgerMobile = document.getElementById('hamburger-mobile');
+    const hamburgerDesktop = document.getElementById('hamburger-desktop');
+    const sideMenu = document.getElementById('side-menu');
+    
+    const womenToggle = document.getElementById('women-toggle');
+    const womenSubmenu = document.getElementById('women-submenu');
+    const menToggle = document.getElementById('men-toggle');
+    const menSubmenu = document.getElementById('men-submenu');
+
+    function toggleMenu() {
+        const isOpen = sideMenu.classList.toggle('open');
+        
+        if (hamburgerMobile) {
+             hamburgerMobile.classList.toggle('open', isOpen);
+        }
+        if (hamburgerDesktop) {
+            hamburgerDesktop.classList.toggle('open', isOpen);
+        }
+
+        document.body.classList.toggle('overflow-hidden', isOpen); 
+    }
+
+    function toggleSubmenu(toggleElement, submenuElement) {
+        // Close the other submenu if it's open
+        if (toggleElement === womenToggle && menSubmenu.classList.contains('open')) {
+            menSubmenu.classList.remove('open');
+            menToggle.setAttribute('aria-expanded', 'false');
+        } else if (toggleElement === menToggle && womenSubmenu.classList.contains('open')) {
+            womenSubmenu.classList.remove('open');
+            womenToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        const isOpen = submenuElement.classList.toggle('open');
+        toggleElement.setAttribute('aria-expanded', isOpen);
+    }
+
+    // Main menu open/close listeners
+    if (hamburgerMobile) {
+        hamburgerMobile.addEventListener('click', toggleMenu);
+    }
+    if (hamburgerDesktop) {
+        hamburgerDesktop.addEventListener('click', toggleMenu);
+    }
+
+    // Submenu toggle listeners
+    if (womenToggle && womenSubmenu) {
+        womenToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSubmenu(womenToggle, womenSubmenu);
+        });
+        womenToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    if (menToggle && menSubmenu) {
+        menToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSubmenu(menToggle, menSubmenu);
+        });
+        menToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    // Close menu when a link is clicked (excluding the toggles)
+    document.querySelectorAll('.side-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (sideMenu.classList.contains('open') && link.id !== 'women-toggle' && link.id !== 'men-toggle') {
+                // Delay closing slightly to allow for link navigation
+                setTimeout(toggleMenu, 100); 
+            }
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (sideMenu.classList.contains('open') && window.innerWidth >= 640) {
+            sideMenu.classList.remove('open');
+            if (hamburgerDesktop) hamburgerDesktop.classList.remove('open');
+            if (hamburgerMobile) hamburgerMobile.classList.remove('open');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // Slideshow Logic (Kept as is for Autoscroll)
+    // ------------------------------------------------------------------
+    let slideIndex = 0;
+    const slides = document.getElementsByClassName("mySlides");
+
+    function showSlides() {
+        if (slides.length === 0) return;
+
+        // Hide all slides
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].classList.remove('active');
+        }
+        
+        // Increment index, looping back to 0
+        slideIndex++;
+        if (slideIndex > slides.length) {slideIndex = 1}    
+        
+        // Show the current slide
+        slides[slideIndex-1].classList.add('active');  
+        
+        // Change image every 5 seconds (Autoscroll)
+        setTimeout(showSlides, 5000); 
+    }
+
+    // Start the slideshow and ensure video elements play on window load
+    window.onload = function() {
+        showSlides();
+        
+        // Attempt to play the video (mandatory for autoplay to work in some browsers)
+        const videoElement = document.getElementById('agency-video');
+        if (videoElement) {
+            videoElement.play().catch(error => {
+                // Autoplay was prevented (e.g., if muted attribute is missing, or user setting)
+                console.warn("Video autoplay prevented:", error);
+            });
+        }
+    };
+</script>
+</body>
+</html>
